@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken'
 
 import {secret} from '../config'
 
-
 export const withAuth = function(req, res, next) {
   const token =
     req.body.token ||

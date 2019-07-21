@@ -5,9 +5,16 @@ const saltRounds = 10;
 
 const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  name: {
+    firstName: { type: String, default: "" },
+    lastName: { type: String, default: "" },
+  },
+  created: {
+    type: Date,
+    default: Date.now,
+  },
 });
-
 
 UserSchema.pre("save", function(next) {
   // Check if document is new or a new password has been set
@@ -27,14 +34,8 @@ UserSchema.pre("save", function(next) {
   }
 });
 
-UserSchema.methods.isCorrectPassword = function(password, callback){
-  bcrypt.compare(password, this.password, function(err, same) {
-    if (err) {
-      callback(err);
-    } else {
-      callback(err, same);
-    }
-  });
-}
+UserSchema.methods.isCorrectPassword = async function(password) {
+  return await bcrypt.compare(password, this.password);
+};
 
 export default mongoose.model("User", UserSchema);

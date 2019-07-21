@@ -16,68 +16,91 @@ app.get("/api/home", function(req, res) {
 });
 
 // POST route to register a user
-app.post("/api/register", function(req, res) {
-  const { email, password } = req.body;
-  const user = new User({ email, password });
-  user.save(err => {
-    if (err) {
-      res.status(500).send("Error registering new user please try again.");
-    } else {
-      res.status(200).send("Welcome to the club!");
-    }
-  });
+app.post("/api/register", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = new User({ email, password });
+    await user.save();
+    res.status(200).send("Welcome to the club!");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error registering new user please try again.");
+  }
 });
 
-app.post("/api/authenticate", function(req, res) {
+app.post("/api/authenticate", async (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email }, function(err, user) {
-    if (err) {
-      console.error(err);
-      res.status(500).json({
-        error: "Internal error please try again"
-      });
-    } else if (!user) {
+  try {
+    const user = await User.findOne({ email }).exec();
+    if (!user) {
       res.status(401).json({
-        error: "Incorrect email or password (44)"
+        error: "Incorrect email or password (44)",
       });
-    } else {
-      user.isCorrectPassword(password, function(err, same) {
-        if (err) {
-          res.status(500).json({
-            error: "Internal error please try again"
-          });
-        } else if (!same) {
-          res.status(401).json({
-            error: "Incorrect email or password (56)"
-          });
-        } else {
-          // Issue token
-          const payload = { email };
-          const token = jwt.sign(payload, secret, {
-            expiresIn: "1h"
-          });
-          //res.cookie('token', token, { httpOnly: true })
-          // .sendStatus(200);
-          res.status(200).send({ token });
-        }
-      });
+      return;
     }
-  });
+    const same = await user.isCorrectPassword(password);
+    if (!same) {
+      res.status(401).json({
+        error: "Incorrect email or password (56)",
+      });
+      return;
+    }
+    const payload = { email };
+    const token = jwt.sign(payload, secret, {
+      expiresIn: "1h",
+    });
+    res.status(200).send({ token });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      error: "Internal error please try again",
+    });
+  }
 });
 
-app.get("/api/secret", withAuth, function(req, res) {
+app.get("/api/secret", withAuth, (req, res) => {
   res.status(200).send("The password is potato, but this secret");
   console.log(req.email);
 });
 
-app.get("/checkToken", withAuth, function(req, res) {
+app.get("/api/checkToken", withAuth, (req, res) => {
   res.sendStatus(200);
 });
 
-mongooseConnect()
-  .then(() => {
-    app.listen(3001, async () => {
-      console.log("listening on port 3001");
+app.get("/api/getUserProfile", withAuth, async (req, res) => {
+  const user = await User.findOne({ email: req.email }).exec();
+  if (!user) {
+    res.status(404).json({
+      error: "User not found",
     });
-  })
-  .catch(error => console.error(error));
+    return;
+  }
+  res.status(200).json(user);
+});
+
+app.get("/api/updateUserProfile", withAuth, async (req, res) => {
+  const user = await User.findOne({ email: req.email }).exec();
+  if (!user) {
+    res.status(404).json({
+      error: "User not found",
+    });
+    return;
+  }
+  const { name } = req.body;
+  user.name = name
+  await user.save()
+  res.status(200).json(user);
+});
+
+const connect = async () => {
+  try {
+    await mongooseConnect();
+    await app.listen(3001);
+
+    console.log("listening on port 3001");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+connect();
