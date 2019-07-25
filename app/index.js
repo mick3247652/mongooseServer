@@ -7,12 +7,17 @@ import User from "./models/User";
 
 import { secret } from "./config";
 import { withAuth } from "./db/middleware";
+import {version} from "./config"
 
 const app = express();
 app.use(bodyParser.json());
 
 app.get("/api/home", function(req, res) {
-  res.send("Welcome!");
+  res.status(200).send("Welcome!");
+});
+
+app.get("/api/version", function(req, res) {
+  res.status(200).send(version);
 });
 
 // POST route to register a user
