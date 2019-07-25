@@ -30,6 +30,7 @@ app.post("/api/register", async (req, res) => {
 
 app.post("/api/authenticate", async (req, res) => {
   const { email, password } = req.body;
+  console.log(`email:${email} password:${password}`);
   try {
     const user = await User.findOne({ email }).exec();
     if (!user) {
@@ -87,15 +88,19 @@ app.get("/api/updateUserProfile", withAuth, async (req, res) => {
     return;
   }
   const { name } = req.body;
-  user.name = name
-  await user.save()
+  user.name = name;
+  await user.save();
   res.status(200).json(user);
 });
 
 const connect = async () => {
   try {
     await mongooseConnect();
-    await app.listen(3001);
+    let port = process.env.PORT;
+    if (!port) {
+      port = 3001;
+    }
+    await app.listen(port);
 
     console.log("listening on port 3001");
   } catch (err) {
