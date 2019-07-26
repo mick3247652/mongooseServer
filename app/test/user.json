@@ -1,0 +1,26 @@
+{
+  "profile": {
+    "name": "Mikhael Dunaev",
+    "avatar": "http://ya.ru",
+    "address": {
+      "city": "Some city",
+      "country": "Some country"
+    },
+    "emails": [
+      {
+        "email": "mick.dunaev@yandex.ru",
+        "name": "work"
+      },
+      {
+        "email": "mick.dunaev@gmail.com",
+        "name": "home"
+      }
+    ],
+    "tels": [
+      {
+        "tel": "+79789229407",
+        "name": "work"
+      }
+    ]
+  }
+}

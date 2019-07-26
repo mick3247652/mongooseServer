@@ -92,8 +92,8 @@ app.get("/api/updateUserProfile", withAuth, async (req, res) => {
     });
     return;
   }
-  const { name } = req.body;
-  user.name = name;
+  const { profile } = req.body;
+  user.profile = profile;
   await user.save();
   res.status(200).json(user);
 });
