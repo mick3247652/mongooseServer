@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   profile: {
     name: { type: String, default: "" },
     avatar: { type: String, default: "" },
+    avatarBackground: {type: String, default: ""},
     address: {
       city: { type: String, default: "" },
       country: { type: String, default: "" },
