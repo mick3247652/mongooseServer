@@ -4,20 +4,43 @@ import jwt from "jsonwebtoken";
 
 import { connect as mongooseConnect } from "./db/mongoose-connection";
 import User from "./models/User";
+import Message from "./models/Message"
 
 import { secret } from "./config";
 import { withAuth } from "./db/middleware";
-import {version} from "./config"
+import { version } from "./config"
 
 const app = express();
 app.use(bodyParser.json());
 
-app.get("/api/home", function(req, res) {
+app.get("/api/home", function (req, res) {
   res.status(200).send("Welcome!");
 });
 
-app.get("/api/version", function(req, res) {
+app.get("/api/version", function (req, res) {
   res.status(200).send(version);
+});
+
+app.get("/send", async (req, res) => {
+  try {
+    const { user, message, city } = req.query;
+    //const user = new User({ email, password });
+    //await user.save();
+    console.log(user)
+    console.log(message)
+    console.log(city)
+
+    let time = Date.now()
+    const mess = new Message({ user, message, city, time })
+    await mess.save()
+    const allMessages = await Message.find()
+
+
+    res.status(200).json({ data: allMessages })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error registering new user please try again.");
+  }
 });
 
 // POST route to register a user
@@ -112,5 +135,5 @@ const connect = async () => {
     console.log(err);
   }
 };
-
+console.log("Hello")
 connect();
