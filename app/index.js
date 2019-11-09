@@ -43,6 +43,16 @@ app.get("/send", async (req, res) => {
   }
 });
 
+app.get("/messages", async (req, res) => {
+  try {
+    const allMessages = await Message.find()
+    res.status(200).json({ data: allMessages })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error registering new user please try again.");
+  }
+});
+
 // POST route to register a user
 app.post("/api/register", async (req, res) => {
   try {
