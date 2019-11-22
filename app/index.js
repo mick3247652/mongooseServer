@@ -110,6 +110,30 @@ app.get("/count_from_city_last_day", async (req, res) => {
     res.status(500).send("Error registering new user please try again.");
   }
 });
+
+app.get("/info", async (req, res) => {
+  try {
+    let time = Date.now()
+    time -= 24 * 60 * 60 * 1000
+
+    const allCity = await Message.distinct('city')
+    console.log(allCity)
+    let result = []
+
+    for (const city of allCity) {
+      const allMessages = await Message.find({ city })
+      const allMessagesLastDay = await Message.find({ city, time: { $gt: time } })
+      result.push({ city, all: allMessages.length, lastDay: allMessagesLastDay.length })
+    }
+
+    res.status(200).json({ data: result })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error registering new user please try again.");
+  }
+});
+
+
 // POST route to register a user
 app.post("/api/register", async (req, res) => {
   try {
