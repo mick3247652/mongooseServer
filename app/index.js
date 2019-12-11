@@ -33,7 +33,10 @@ app.get("/send", async (req, res) => {
     let time = Date.now()
     const mess = new Message({ user, message, city, time })
     await mess.save()
-    const allMessages = await Message.find()
+    //const allMessages = await Message.find()
+    time -= 24 * 60 * 60 * 1000
+
+    const allMessages = await Message.find({ time: { $gt: time } })
 
 
     res.status(200).json({ data: allMessages })
