@@ -24,13 +24,13 @@ app.get("/api/version", function (req, res) {
 
 app.get("/addfrend", async (req, res) => {
   try {
-    const { from, to } = req.query;
+    const { from, to, nickname } = req.query;
     //const user = new User({ email, password });
     //await user.save();
     console.log(from)
     console.log(to)
     let time = Date.now()
-    const frend = new Frend({ from, to })
+    const frend = new Frend({ from, to, nickname })
     await frend.save()
     //const allMessages = await Message.find()
     time -= 24 * 60 * 60 * 1000
