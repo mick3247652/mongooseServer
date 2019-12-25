@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { connect as mongooseConnect } from "./db/mongoose-connection";
 import User from "./models/User";
 import Message from "./models/Message"
+import Frend from "./models/Frend"
 
 import { secret } from "./config";
 import { withAuth } from "./db/middleware";
@@ -20,6 +21,31 @@ app.get("/api/home", function (req, res) {
 app.get("/api/version", function (req, res) {
   res.status(200).send(version);
 });
+
+app.get("/addfrend", async (req, res) => {
+  try {
+    const { from, to } = req.query;
+    //const user = new User({ email, password });
+    //await user.save();
+    console.log(from)
+    console.log(to)
+    let time = Date.now()
+    const frend = new Frend({ from, to })
+    await frend.save()
+    //const allMessages = await Message.find()
+    time -= 24 * 60 * 60 * 1000
+
+    const allMessages = await Message.find({ time: { $gt: time } })
+
+
+    res.status(200).json({ data: allMessages })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error registering new user please try again.");
+  }
+});
+
+
 
 app.get("/send", async (req, res) => {
   try {
@@ -60,6 +86,20 @@ app.get("/messages", async (req, res) => {
 
     const allMessages = await Message.find({ time: { $gt: time } })
     res.status(200).json({ data: allMessages })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error registering new user please try again.");
+  }
+});
+
+app.get("/getfrends", async (req, res) => {
+  try {
+    const { to } = req.query;
+    //let time = Date.now()
+    //time -= 24 * 60 * 60 * 1000
+
+    const all = await Frend.find({ to })
+    res.status(200).json({ data: all })
   } catch (err) {
     console.log(err);
     res.status(500).send("Error registering new user please try again.");
