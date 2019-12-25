@@ -23,15 +23,16 @@ app.get("/api/version", function (req, res) {
 
 app.get("/send", async (req, res) => {
   try {
-    const { user, message, city } = req.query;
+    const { user, message, city, data } = req.query;
     //const user = new User({ email, password });
     //await user.save();
     console.log(user)
     console.log(message)
     console.log(city)
+    if (!data) data = ""
 
     let time = Date.now()
-    const mess = new Message({ user, message, city, time })
+    const mess = new Message({ user, message, city, time, data })
     await mess.save()
     //const allMessages = await Message.find()
     time -= 24 * 60 * 60 * 1000
