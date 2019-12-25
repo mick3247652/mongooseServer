@@ -29,11 +29,17 @@ app.get("/send", async (req, res) => {
     console.log(user)
     console.log(message)
     console.log(city)
-    if (!data) data = ""
 
     let time = Date.now()
-    const mess = new Message({ user, message, city, time, data })
-    await mess.save()
+    if (!data) {
+      console.log("data undefiner")
+      const mess = new Message({ user, message, city, time, data: "" })
+      await mess.save()
+    } else {
+      const mess = new Message({ user, message, city, time, data })
+      await mess.save()
+
+    }
     //const allMessages = await Message.find()
     time -= 24 * 60 * 60 * 1000
 
