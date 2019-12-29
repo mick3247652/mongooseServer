@@ -6,6 +6,7 @@ import { connect as mongooseConnect } from "./db/mongoose-connection";
 import User from "./models/User";
 import Message from "./models/Message"
 import Frend from "./models/Frend"
+import Like from "./models/Like"
 
 import { secret } from "./config";
 import { withAuth } from "./db/middleware";
@@ -21,7 +22,28 @@ app.get("/api/home", function (req, res) {
 app.get("/api/version", function (req, res) {
   res.status(200).send(version);
 });
+app.get("/addlike", async (req, res) => {
+  try {
+    const { message, nickname } = req.query;
+    //const user = new User({ email, password });
+    //await user.save();
+    //console.log(from)
+    //console.log(to)
+    let time = Date.now()
+    const frend = new Like({ message, nickname })
+    await frend.save()
+    //const allMessages = await Message.find()
+    time -= 24 * 60 * 60 * 1000
 
+    const allMessages = await Message.find({ time: { $gt: time } })
+
+
+    res.status(200).json({ data: allMessages })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error registering new user please try again.");
+  }
+});
 app.get("/addfrend", async (req, res) => {
   try {
     const { from, to, nickname } = req.query;
@@ -105,7 +127,19 @@ app.get("/getfrends", async (req, res) => {
     res.status(500).send("Error registering new user please try again.");
   }
 });
+app.get("/getlikes", async (req, res) => {
+  try {
+    const { nickname } = req.query;
+    //let time = Date.now()
+    //time -= 24 * 60 * 60 * 1000
 
+    const all = await Like.find({ nickname })
+    res.status(200).json({ data: all })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error registering new user please try again.");
+  }
+});
 app.get("/from_city", async (req, res) => {
   try {
     const { city } = req.query;
