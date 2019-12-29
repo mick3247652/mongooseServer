@@ -32,6 +32,19 @@ app.get("/addlike", async (req, res) => {
     let time = Date.now()
     const frend = new Like({ message, nickname })
     await frend.save()
+
+    const mess = await Message.findOne({ _id: message })
+    console.log(mess)
+    if (mess.likecount) {
+      console.log(mess.likecount)
+      mess.likecount += 1
+    }
+    else {
+      console.log("like undefined")
+      mess.likecount = 1
+    }
+    console.log(mess)
+    await mess.save()
     //const allMessages = await Message.find()
     time -= 24 * 60 * 60 * 1000
 
