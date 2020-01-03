@@ -7,6 +7,7 @@ const MessageSchema = new mongoose.Schema({
   time: { type: String, required: true },
   data: { type: String },
   likecount: { type: Number },
+  to: { type: String },
 });
 
 export default mongoose.model("Message", MessageSchema);

@@ -84,7 +84,7 @@ app.get("/addfrend", async (req, res) => {
 
 app.get("/send", async (req, res) => {
   try {
-    const { user, message, city, data } = req.query;
+    const { user, message, city, data, to } = req.query;
     //const user = new User({ email, password });
     //await user.save();
     console.log(user)
@@ -94,13 +94,26 @@ app.get("/send", async (req, res) => {
     let time = Date.now()
     if (!data) {
       console.log("data undefiner")
-      const mess = new Message({ user, message, city, time, data: "" })
-      await mess.save()
+      if (!to) {
+        const mess = new Message({ user, message, city, time, data: "", to: "" })
+        await mess.save()
+      } else {
+        const mess = new Message({ user, message, city, time, data: "", to })
+        await mess.save()
+
+      }
     } else {
-      const mess = new Message({ user, message, city, time, data })
-      await mess.save()
+      if (!to) {
+        const mess = new Message({ user, message, city, time, data, to: "" })
+        await mess.save()
+      } else {
+        const mess = new Message({ user, message, city, time, data, to })
+        await mess.save()
+
+      }
 
     }
+
     //const allMessages = await Message.find()
     time -= 24 * 60 * 60 * 1000
 
