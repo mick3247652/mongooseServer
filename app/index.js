@@ -117,8 +117,8 @@ app.get("/send", async (req, res) => {
     //const allMessages = await Message.find()
     time -= 24 * 60 * 60 * 1000
 
-    const allMessages = await Message.find({ time: { $gt: time } })
-
+    //const allMessages = await Message.find({ time: { $gt: time } })
+    const allMessages = await Message.find({ city })
 
     res.status(200).json({ data: allMessages })
   } catch (err) {
