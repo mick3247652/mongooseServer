@@ -1,16 +1,34 @@
 import express from "express";
 import bodyParser from "body-parser";
 import jwt from "jsonwebtoken";
+import FCM from "fcm-node"
 
 import { connect as mongooseConnect } from "./db/mongoose-connection";
 import User from "./models/User";
 import Message from "./models/Message"
 import Frend from "./models/Frend"
 import Like from "./models/Like"
+import Notify from "./models/Notjfy"
 
 import { secret } from "./config";
 import { withAuth } from "./db/middleware";
 import { version } from "./config"
+
+var serverKey = 'AIzaSyCMkuXoJlvCPyxCFW29cEqR89vklwhDY_Q';
+var fcm = new FCM(serverKey)
+var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+  to: 'ebbtmBB2Ud4:APA91bGwmySAAZNf_w4K_HP4NO3nsWs1TcCtDovFoYQHkc7ydCPyQDdyb8vaoOsDUiMqffbKbEC8BtWqmGuhPXeMYDGL2CFXsoI1mu45aL5zuGPx4spE6zMAj11GFC7HlILx-CUBcCg6',
+
+  notification: {
+    title: 'Title of your push notification',
+    body: 'Body of your push notification'
+  },
+
+  data: {  //you can send only notification or only data(or include both)
+    my_key: 'my value',
+    my_another_key: 'my another value'
+  }
+};
 
 const app = express();
 app.use(bodyParser.json());
@@ -18,10 +36,32 @@ app.use(bodyParser.json());
 app.get("/api/home", function (req, res) {
   res.status(200).send("Welcome!");
 });
+app.get("/api/notify", function (req, res) {
+  fcm.send(message, function (err, response) {
+    if (err) {
+      console.log("Something has gone wrong!");
+    } else {
+      console.log("Successfully sent with response: ", response);
+    }
+  });
+  res.status(200).send("Welcome!");
+});
 
 app.get("/api/version", function (req, res) {
   res.status(200).send(version);
 });
+
+app.get("/addnotifyuser", async (req, res) => {
+  const { nickname, token } = req.query;
+  let user = await Notify.findOne({ nickname })
+  if (user) {
+    user.token = token
+  } else {
+    user = new Notify({ nickname, token })
+  }
+  await user.save()
+}
+
 app.get("/addlike", async (req, res) => {
   try {
     const { message, nickname } = req.query;
