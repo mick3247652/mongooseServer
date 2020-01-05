@@ -8,7 +8,6 @@ import User from "./models/User";
 import Message from "./models/Message"
 import Frend from "./models/Frend"
 import Like from "./models/Like"
-import Notify from "./models/Notjfy"
 
 import { secret } from "./config";
 import { withAuth } from "./db/middleware";
@@ -46,11 +45,6 @@ app.get("/api/notify", function (req, res) {
   });
   res.status(200).send("Welcome!");
 });
-
-app.get("/api/version", function (req, res) {
-  res.status(200).send(version);
-});
-
 app.get("/addnotifyuser", async (req, res) => {
   const { nickname, token } = req.query;
   let user = await Notify.findOne({ nickname })
@@ -60,8 +54,12 @@ app.get("/addnotifyuser", async (req, res) => {
     user = new Notify({ nickname, token })
   }
   await user.save()
-}
+  res.status(200).send("Welcome!");
+});
 
+app.get("/api/version", function (req, res) {
+  res.status(200).send(version);
+});
 app.get("/addlike", async (req, res) => {
   try {
     const { message, nickname } = req.query;
