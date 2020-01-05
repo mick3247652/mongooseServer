@@ -5,4 +5,4 @@ const NotifySchema = new mongoose.Schema({
   token: { type: String },
 });
 
-export default mongoose.model("Frend", NotifySchema);
+export default mongoose.model("Notify", NotifySchema);
