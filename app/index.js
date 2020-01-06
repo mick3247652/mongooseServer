@@ -57,7 +57,13 @@ app.get("/addnotifyuser", async (req, res) => {
     user = new Notify({ nickname, token })
   }
   await user.save()
-  res.status(200).send("Welcome!");
+  time -= 24 * 60 * 60 * 1000
+
+  const allMessages = await Message.find({ time: { $gt: time } })
+
+
+  res.status(200).json({ data: allMessages })
+
 });
 
 app.get("/api/version", function (req, res) {
