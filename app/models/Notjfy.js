@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const NotifySchema = new mongoose.Schema({
-  nikname: { type: String },
+  nickname: { type: String },
   token: { type: String },
 });
 
