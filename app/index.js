@@ -46,6 +46,34 @@ app.get("/api/notify", function (req, res) {
   });
   res.status(200).send("Welcome!");
 });
+
+async function notify_fcm(nickname, mess) {
+  let user = await Notify.findOne({ nickname })
+  if (user) {
+    let token = user.token
+    var m = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+      to: token,
+
+      notification: {
+        title: nickname,
+        body: mess
+      },
+
+      data: {  //you can send only notification or only data(or include both)
+        my_key: 'my value',
+        my_another_key: 'my another value'
+      }
+    };
+    fcm.send(m, function (err, response) {
+      if (err) {
+        console.log("Something has gone wrong!");
+      } else {
+        console.log("Successfully sent with response: ", response);
+      }
+    });
+
+  }
+}
 app.get("/addnotifyuser", async (req, res) => {
   const { nickname, token } = req.query;
   let user = await Notify.findOne({ nickname })
@@ -57,6 +85,7 @@ app.get("/addnotifyuser", async (req, res) => {
     user = new Notify({ nickname, token })
   }
   await user.save()
+  let time = Date.now()
   time -= 24 * 60 * 60 * 1000
 
   const allMessages = await Message.find({ time: { $gt: time } })
@@ -147,7 +176,7 @@ app.get("/send", async (req, res) => {
       } else {
         const mess = new Message({ user, message, city, time, data: "", to })
         await mess.save()
-
+        await notify_fcm(to, message)
       }
     } else {
       if (!to) {
@@ -156,7 +185,7 @@ app.get("/send", async (req, res) => {
       } else {
         const mess = new Message({ user, message, city, time, data, to })
         await mess.save()
-
+        await notify_fcm(to, message)
       }
 
     }
