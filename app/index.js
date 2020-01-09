@@ -9,6 +9,7 @@ import Message from "./models/Message"
 import Frend from "./models/Frend"
 import Like from "./models/Like"
 import Notify from "./models/Notjfy"
+import Mute from "./models/Mute"
 
 import { secret } from "./config";
 import { withAuth } from "./db/middleware";
@@ -94,6 +95,56 @@ app.get("/addnotifyuser", async (req, res) => {
   res.status(200).json({ data: allMessages })
 
 });
+
+app.get("/addmute", async (req, res) => {
+  const { user, to } = req.query;
+  let mute = await Mute.findOne({ user, to })
+  console.log(mute)
+
+  if (mute) {
+    //user.token = token
+  } else {
+    mute = new Mute({ user, to })
+  }
+  await mute.save()
+
+  let mutes = await Mute.find({ user })
+  console.log(mutes)
+
+  res.status(200).json({ data: mutes })
+
+});
+
+app.get("/removemute", async (req, res) => {
+  const { user, to } = req.query;
+  let mute = await Mute.findOne({ user, to })
+  console.log(mute)
+
+  if (mute) {
+    //user.token = token
+    await mute.remove()
+  } else {
+    //mute = new Mute({ user, to })
+  }
+  //await mute.save()
+
+  let mutes = await Mute.find({ user })
+  console.log(mutes)
+
+  res.status(200).json({ data: mutes })
+
+});
+
+app.get("/getmutes", async (req, res) => {
+  const { user } = req.query;
+  let mutes = await Mute.find({ user })
+  console.log(mutes)
+
+  res.status(200).json({ data: mutes })
+
+});
+
+
 
 app.get("/api/version", function (req, res) {
   res.status(200).send(version);
